@@ -1,6 +1,8 @@
 package com.shop.service;
 
 import com.shop.bean.*;
+
+import java.util.Hashtable;
 import java.util.List;
 
 public interface OrderService {

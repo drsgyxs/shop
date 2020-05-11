@@ -154,6 +154,8 @@ public class UserServiceImpl implements UserService {
         criteria.andMailEqualTo(user.getMail()).andPasswordEqualTo(user.getPassword());
         List<User> users = dao.selectByExample(userExample);
         if (!users.isEmpty()) {
+            if (users.get(0).getIsClose() == 1)
+                throw new BasicException("您的帐号已被封禁，暂时无法登录");
             String token = TokenUtil.sign(users.get(0).getId(), users.get(0).getMail());
             res.setData(token);
             if (token == null)

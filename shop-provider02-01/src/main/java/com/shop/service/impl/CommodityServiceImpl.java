@@ -25,6 +25,8 @@ public class CommodityServiceImpl implements CommodityService {
     private final CommodityImageDAO imageDAO;
     @Value("${custom.upload-folder}")
     private String FILE_FOLDER;
+    @Value("${eureka.instance.ip-address}")
+    private String HOST;
 
     public CommodityServiceImpl(CommodityDAO dao, CommodityImageDAO imageDAO) {
         this.dao = dao;
@@ -46,11 +48,15 @@ public class CommodityServiceImpl implements CommodityService {
 
     @Override
 //    @Cacheable(value="commodity", key = "#root.methodName+#root.args")
-    public ResponseBody<List<Commodity>> getCommodityList(Integer pageIndex, Integer pageSize, Integer order) {
+    public ResponseBody<List<Commodity>> getCommodityList(Boolean isSale, Integer pageIndex, Integer pageSize, Integer order) {
         CommodityExample commodityExample = new CommodityExample();
         commodityExample.setOffset((long)(pageIndex - 1) * pageSize);
         commodityExample.setLimit(pageSize);
         commodityExample.setOrderByClause(getOrderString(order));
+        if (isSale) {
+            CommodityExample.Criteria criteria = commodityExample.createCriteria();
+            criteria.andStateEqualTo(1);
+        }
         long total = dao.countByExample(commodityExample);
         List<Commodity> commodities = dao.selectByExample(commodityExample);
         Map<String, Object> map = new HashMap<>();
@@ -66,7 +72,7 @@ public class CommodityServiceImpl implements CommodityService {
         commodityExample.setOffset((long)(pageIndex - 1) * pageSize);
         commodityExample.setLimit(pageSize);
         CommodityExample.Criteria criteria = commodityExample.createCriteria();
-        criteria.andTypeIdEqualTo(typeId);
+        criteria.andTypeIdEqualTo(typeId).andStateEqualTo(1);
         commodityExample.setOrderByClause(getOrderString(order));
         long total = dao.countByExample(commodityExample);
         List<Commodity> commodities = dao.selectByExample(commodityExample);
@@ -85,6 +91,7 @@ public class CommodityServiceImpl implements CommodityService {
         CommodityExample.Criteria criteria = commodityExample.createCriteria();
         for (int index = 0; index < name.length(); index++)
             criteria.andNameLike("%" + name.substring(index, index + 1) + "%");
+        criteria.andStateEqualTo(1);
         commodityExample.setOrderByClause(getOrderString(order));
         long total = dao.countByExample(commodityExample);
         List<Commodity> commodities = dao.selectByExample(commodityExample);
@@ -145,8 +152,9 @@ public class CommodityServiceImpl implements CommodityService {
             e.printStackTrace();
             throw new BasicException("上传文件失败");
         }
+        String fileUrl = HOST + "/shop/img/products/" + fileName;
         CommodityImage image = new CommodityImage();
-        image.setImgName(fileName);
+        image.setImgName(fileUrl);
         image.setCommodityId(commodityId);
         return ResponseBody.success(imageDAO.insert(image));
     }

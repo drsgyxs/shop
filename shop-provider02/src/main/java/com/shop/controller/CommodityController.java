@@ -24,10 +24,11 @@ public class CommodityController {
     }
 
     @GetMapping("/commodity")
-    public ResponseBody<List<Commodity>> getCommodityList(@NotNull(message = "当前页码不能为空") Integer pageIndex,
+    public ResponseBody<List<Commodity>> getCommodityList(@RequestParam(required = false, defaultValue = "false") Boolean isSale,
+                                                          @NotNull(message = "当前页码不能为空") Integer pageIndex,
                                                           @RequestParam(required = false, defaultValue = "8") Integer pageSize,
                                                           @RequestParam(required = false, defaultValue = "0") Integer order) {
-        return commodityService.getCommodityList(pageIndex, pageSize, order);
+        return commodityService.getCommodityList(isSale, pageIndex, pageSize, order);
     }
 
     @GetMapping("/commodity/type/{typeId}")

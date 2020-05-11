@@ -24,10 +24,11 @@ public class CommodityController {
     }
 
     @GetMapping("/commodity")
-    public ResponseBody<List<Commodity>> getCommodityList(@NotNull(message = "当前页码不能为空") Integer pageIndex,
+    public ResponseBody<List<Commodity>> getCommodityList(@RequestParam(required = false, defaultValue = "false") Boolean isSale,
+                                                          @NotNull(message = "当前页码不能为空") Integer pageIndex,
                                                           @RequestParam(required = false, defaultValue = "8") Integer pageSize,
                                                           @RequestParam(required = false, defaultValue = "0") Integer order) {
-        return commodityService.getCommodityList(pageIndex, pageSize, order);
+        return commodityService.getCommodityList(isSale, pageIndex, pageSize, order);
     }
 
     @GetMapping("/commodity/type/{typeId}")
@@ -53,13 +54,13 @@ public class CommodityController {
 
     @GetMapping("/commodity/idList")
     public ResponseBody<List<Commodity>> getCommoditiesByIdList(@NotEmpty(message = "商品id列表不能为空")
-                                                                    @RequestParam(value = "list") List<Integer> commodityIdList) {
+                                                                @RequestParam(value = "list") List<Integer> commodityIdList) {
         return commodityService.getCommoditiesByIdList(commodityIdList);
     }
 
     @PutMapping("/commodity/list")
     public ResponseBody<Integer> updateList(@NotEmpty(message = "商品列表不能为空")
-                                                @RequestBody List<Commodity> commodityList) {
+                                            @RequestBody List<Commodity> commodityList) {
         return commodityService.updateList(commodityList);
     }
 

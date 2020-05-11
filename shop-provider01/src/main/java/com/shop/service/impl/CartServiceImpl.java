@@ -65,6 +65,14 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public ResponseBody<Integer> addCart(Integer userId, Cart cart) {
+        ResponseBody<Commodity> commodityRes = commodityClient.getCommodityById(cart.getCommodityId());
+        if (commodityRes.getCode() != 0)
+            throw new BasicException(commodityRes.getMsg());
+        Commodity commodity = commodityRes.getData();
+        if (commodity.getState() == 0)
+            throw new BasicException("商品已下架");
+        if (commodity.getStock() < cart.getQuantity())
+            throw new BasicException("库存不足");
         cart.setUserId(userId);
         CartExample cartExample = new CartExample();
         CartExample.Criteria criteria = cartExample.createCriteria();

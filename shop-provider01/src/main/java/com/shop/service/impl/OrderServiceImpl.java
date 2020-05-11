@@ -58,13 +58,6 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public ResponseBody<Long> addOrder(Integer userId, Integer addressId, List<Cart> cartList) {
         Long orderId = OrderUtil.getOrderNumber();
-        Order order = new Order();
-        order.setId(orderId);
-        order.setUserId(userId);
-        Address address = addressService.getAddressById(addressId);
-        order.setAddress(address.getProvince() + address.getCity() + address.getDistrict() + address.getDetailedAddress());
-        order.setReceiverName(address.getReceiverName());
-        order.setTel(address.getTel());
         List<Integer> commodityIdList = CommonUtil.getIntListFromList(cartList, "commodityId");
         ResponseBody<List<Commodity>> res = commodityService.getCommoditiesByIdList(commodityIdList);
         if (res.getCode() != 0)
@@ -79,7 +72,6 @@ public class OrderServiceImpl implements OrderService {
                         throw new BasicException("商品“" + commodity.getName() + "”库存不足");
                     // 更新库存
                     commodity.setStock(commodity.getStock() - cart.getQuantity());
-//                    commodity.setSales(commodity.getSales() + cart.getQuantity());
                     OrderDetail info = new OrderDetail();
                     info.setCommodityId(commodity.getId());
                     info.setCommodityName(commodity.getName());
@@ -92,6 +84,13 @@ public class OrderServiceImpl implements OrderService {
                 }
             }
         }
+		Order order = new Order();
+        order.setId(orderId);
+        order.setUserId(userId);
+        Address address = addressService.getAddressById(addressId);
+        order.setAddress(address.getProvince() + address.getCity() + address.getDistrict() + address.getDetailedAddress());
+        order.setReceiverName(address.getReceiverName());
+        order.setTel(address.getTel());
         order.setTotalPrice(totalPrice);
         // 创建订单
         orderDAO.insert(order);
@@ -104,27 +103,6 @@ public class OrderServiceImpl implements OrderService {
         if (commUpdateRes.getCode() != 0)
             throw new BasicException(commUpdateRes.getMsg());
         String param = aliPayUtil.pagePay(orderId.toString(), totalPrice.toString(), "订单支付");
-//        } else if (!StringUtils.isEmpty(commodity_id)) {
-//            ResponseBody<Commodity> commodityRes = commodityService.getCommodityById(commodity_id);
-//            if (commodityRes.getCode() != 0)
-//                throw new BasicException(commodityRes.getMsg());
-//            Commodity commodity = commodityRes.getData();
-//            if (commodity.getStock() < number)
-//                throw new BasicException("商品“" + commodity.getName() + "”库存不足");
-//            order.setTotalPrice(commodity.getPrice().multiply(new BigDecimal(number)));
-//            List<Commodity> commodityList = new ArrayList<>(1);
-//            commodityList.add(commodity);
-//            if (commodityService.updateList(commodityList).getCode() != 0)
-//                throw new BasicException("库存更新失败");
-//            orderDAO.insert(order);
-//            OrderDetail info = new OrderDetail();
-//            info.setOrderId(orderId);
-//            info.setCommodityId(commodity_id);
-//            info.setCommodityName(commodity.getName());
-//            info.setPrice(commodity.getPrice());
-//            info.setQuantity(number);
-//            orderDetailDAO.insert(info);
-//        }
         return ResponseBody.success(param);
     }
 

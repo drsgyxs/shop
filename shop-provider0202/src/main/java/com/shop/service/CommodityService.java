@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface CommodityService {
-    ResponseBody<List<Commodity>> getCommodityList(Integer pageIndex, Integer pageSize, Integer order);
+    ResponseBody<List<Commodity>> getCommodityList(Boolean isSale, Integer pageIndex, Integer pageSize, Integer order);
     ResponseBody<List<Commodity>> getCommodityListByTypeId(Integer typeId, Integer pageIndex, Integer pageSize, Integer order);
     ResponseBody<List<Commodity>> getCommodityListByName(String name, Integer pageIndex, Integer pageSize, Integer order);
     ResponseBody<Commodity> getCommodityById(Integer commodityId);
