@@ -152,7 +152,7 @@ public class CommodityServiceImpl implements CommodityService {
             e.printStackTrace();
             throw new BasicException("上传文件失败");
         }
-        String fileUrl = HOST + "/shop/img/products/" + fileName;
+        String fileUrl = "//" + HOST + "/shop/img/products/" + fileName;
         CommodityImage image = new CommodityImage();
         image.setImgName(fileUrl);
         image.setCommodityId(commodityId);
